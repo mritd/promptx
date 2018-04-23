@@ -160,6 +160,8 @@ func (s *Select) Run() int {
 			l.Write([]byte(showCursor))
 			l.Refresh()
 			return r, true
+		case readline.CharEnter:
+			return r, true
 		case readline.CharNext:
 			dataList.Next()
 		case readline.CharPrev:
@@ -168,9 +170,6 @@ func (s *Select) Run() int {
 			dataList.PageDown()
 		case readline.CharBackward:
 			dataList.PageUp()
-		// block CtrlZ feature
-		case readline.CharCtrlZ:
-			return r, false
 		// block other key
 		default:
 			return r, false

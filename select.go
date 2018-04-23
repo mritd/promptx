@@ -168,8 +168,12 @@ func (s *Select) Run() int {
 			dataList.PageDown()
 		case readline.CharBackward:
 			dataList.PageUp()
+		// block CtrlZ feature
+		case readline.CharCtrlZ:
+			return r, false
+		// block other key
 		default:
-			return r, true
+			return r, false
 		}
 		s.writeData(dataList)
 		l.Write(s.buf.Bytes())

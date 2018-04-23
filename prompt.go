@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/mritd/idgen/util"
 	"github.com/mritd/readline"
+	"github.com/mritd/promptx/util"
 )
 
 const (

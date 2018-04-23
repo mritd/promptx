@@ -7,8 +7,6 @@ import (
 
 	"bytes"
 
-	"strings"
-
 	"fmt"
 
 	"github.com/mritd/promptx/list"
@@ -31,7 +29,7 @@ type Select struct {
 	Config *SelectConfig
 	Items  interface{}
 	buf    bytes.Buffer
-	high   int
+	high   uint
 
 	selectPrompt *template.Template
 	selectHeader *template.Template
@@ -101,7 +99,7 @@ func (s *Select) writeData(l *list.List) {
 	// clean buffer
 	s.buf.Reset()
 
-	for i := 0; i < s.high; i++ {
+	for i := uint(0); i < s.high; i++ {
 		s.buf.Write([]byte(moveUp))
 		s.buf.Write([]byte(clearLine))
 	}
@@ -131,7 +129,8 @@ func (s *Select) writeData(l *list.List) {
 	s.buf.Write([]byte(hideCursor))
 
 	// set high
-	s.high = len(strings.Split(s.buf.String(), "\n")) - 1
+	//s.high = len(strings.Split(s.buf.String(), "\n")) - 1
+	s.high = util.GetTerminalHeight()
 }
 
 func (s *Select) Run() int {
@@ -193,7 +192,7 @@ func (s *Select) Run() int {
 
 	// clean terminal
 	s.buf.Reset()
-	for i := 0; i < s.high; i++ {
+	for i := uint(0); i < s.high; i++ {
 		s.buf.Write([]byte(moveUp))
 		s.buf.Write([]byte(clearLine))
 	}

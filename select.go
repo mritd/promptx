@@ -99,13 +99,11 @@ func (s *Select) writeData(l *list.List) {
 	// clean buffer
 	s.buf.Reset()
 
+	// clean terminal
 	for i := uint(0); i < s.high; i++ {
 		s.buf.Write([]byte(moveUp))
 		s.buf.Write([]byte(clearLine))
 	}
-
-	// clean terminal
-	s.buf.Write([]byte(clearStartOfLine))
 
 	// select header
 	s.buf.Write(render(s.selectHeader, ""))

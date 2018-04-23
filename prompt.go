@@ -1,12 +1,10 @@
-package prompt
+package promptx
 
 import (
-	"bytes"
-	"fmt"
 	"text/template"
 
-	"github.com/mritd/readline"
 	"github.com/mritd/promptx/util"
+	"github.com/mritd/readline"
 )
 
 const (
@@ -79,47 +77,33 @@ func (p *Prompt) prepareTemplates() {
 
 }
 
-func render(tpl *template.Template, data interface{}) []byte {
-	var buf bytes.Buffer
-	err := tpl.Execute(&buf, data)
-	if err != nil {
-		return []byte(fmt.Sprintf("%v", data))
-	}
-	return buf.Bytes()
-}
-
-func promptFilterInput(r rune) (rune, bool) {
-
-	switch r {
-	// block CtrlZ feature
-	case readline.CharCtrlZ:
-		return r, false
-	// clear line
-	case readline.CharInterrupt:
-		fmt.Print(moveDown)
-		fmt.Print(clearLine)
-		fmt.Print(moveUp)
-		return r, true
-	default:
-		return r, true
-	}
-}
-
 func (p *Prompt) Run() string {
 	p.isFirstRun = true
 	p.prepareTemplates()
 
-	displayPrompt := append(render(p.prompt, p.Prompt), render(p.ask, p.Ask)...)
-	validPrompt := append(render(p.valid, p.Prompt), render(p.ask, p.Ask)...)
-	invalidPrompt := append(render(p.invalid, p.Prompt), render(p.ask, p.Ask)...)
+	displayPrompt := append(util.Render(p.prompt, p.Prompt), util.Render(p.ask, p.Ask)...)
+	validPrompt := append(util.Render(p.valid, p.Prompt), util.Render(p.ask, p.Ask)...)
+	invalidPrompt := append(util.Render(p.invalid, p.Prompt), util.Render(p.ask, p.Ask)...)
 
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:                 string(displayPrompt),
 		DisableAutoSaveHistory: true,
 		InterruptPrompt:        "^C",
-		FuncFilterInputRune:    promptFilterInput,
 	})
 	util.CheckAndExit(err)
+
+	filterInput := func(r rune) (rune, bool) {
+
+		switch r {
+		// block CtrlZ feature
+		case readline.CharCtrlZ:
+			return r, false
+		default:
+			return r, true
+		}
+	}
+
+	l.Config.FuncFilterInputRune = filterInput
 
 	l.Config.SetListener(func(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 		// Real-time verification
@@ -137,13 +121,13 @@ func (p *Prompt) Run() string {
 	// read line
 	for {
 		if !p.isFirstRun {
-			fmt.Print(move2Up)
+			l.Write([]byte(moveUp))
 		}
 		s, err := l.Readline()
 		util.CheckAndExit(err)
 		if err = p.CheckListener([]rune(s)); err != nil {
-			fmt.Print(clearLine)
-			fmt.Println(string(render(p.errorMsg, DefaultErrorMsgPrefix+err.Error())))
+			l.Write([]byte(clearLine))
+			l.Write([]byte(string(util.Render(p.errorMsg, DefaultErrorMsgPrefix+err.Error()))))
 			p.isFirstRun = false
 		} else {
 			return s

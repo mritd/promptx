@@ -39,7 +39,7 @@ func main() {
 		{Type: EXIT, ZHDescription: "退出", ENDescription: "Exit commit"},
 	}
 
-	cfg := &prompt.SelectConfig{
+	cfg := &promptx.SelectConfig{
 		ActiveTpl:    "»  {{ .Type | cyan }} ({{ .ENDescription | cyan }})",
 		InactiveTpl:  "  {{ .Type | white }} ({{ .ENDescription | white }})",
 		SelectPrompt: "Commit Type",
@@ -51,7 +51,7 @@ func main() {
 {{ "Description:" | faint }}	{{ .ZHDescription }}({{ .ENDescription }})`,
 	}
 
-	s := &prompt.Select{
+	s := &promptx.Select{
 		Items:  commitTypes,
 		Config: cfg,
 	}

@@ -1,4 +1,4 @@
-package prompt
+package promptx
 
 import (
 	"text/template"
@@ -101,30 +101,30 @@ func (s *Select) writeData(l *list.List) {
 
 	// clean terminal
 	for i := uint(0); i < s.high; i++ {
-		s.buf.Write([]byte(moveUp))
-		s.buf.Write([]byte(clearLine))
+		s.buf.WriteString(moveUp)
+		s.buf.WriteString(clearLine)
 	}
 
 	// select header
-	s.buf.Write(render(s.selectHeader, ""))
+	s.buf.Write(util.Render(s.selectHeader, ""))
 
 	// select prompt
-	s.buf.Write(render(s.selectPrompt, s.Config.SelectPrompt))
+	s.buf.Write(util.Render(s.selectPrompt, s.Config.SelectPrompt))
 
 	items, idx := l.Items()
 
 	for i, item := range items {
 		if i == idx {
-			s.buf.Write(render(s.active, item))
+			s.buf.Write(util.Render(s.active, item))
 		} else {
-			s.buf.Write(render(s.inactive, item))
+			s.buf.Write(util.Render(s.inactive, item))
 		}
 	}
 	// detail
-	s.buf.Write(render(s.details, items[idx]))
+	s.buf.Write(util.Render(s.details, items[idx]))
 
 	// hide cursor
-	s.buf.Write([]byte(hideCursor))
+	s.buf.WriteString(hideCursor)
 
 	// set high
 	//s.high = len(strings.Split(s.buf.String(), "\n")) - 1
@@ -191,8 +191,8 @@ func (s *Select) Run() int {
 	// clean terminal
 	s.buf.Reset()
 	for i := uint(0); i < s.high; i++ {
-		s.buf.Write([]byte(moveUp))
-		s.buf.Write([]byte(clearLine))
+		s.buf.WriteString(moveUp)
+		s.buf.WriteString(clearLine)
 	}
 	l.Write(s.buf.Bytes())
 
@@ -200,7 +200,7 @@ func (s *Select) Run() int {
 	l.Write([]byte(showCursor))
 	l.Refresh()
 
-	fmt.Println(string(render(s.selected, result)))
+	fmt.Println(string(util.Render(s.selected, result)))
 
 	return idx
 

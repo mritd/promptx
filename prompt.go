@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DefaultPrompt         = "»"
+	DefaultPrompt         = "» "
 	DefaultErrorMsgPrefix = "✘ "
 	DefaultAskTpl         = "{{ . | cyan }} "
 	DefaultPromptTpl      = "{{ . | green }} "

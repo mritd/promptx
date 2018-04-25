@@ -9,16 +9,18 @@ import (
 
 	"fmt"
 
+	"strings"
+
 	"github.com/mritd/promptx/list"
 	"github.com/mritd/promptx/util"
 	"github.com/mritd/readline"
 )
 
 const (
-	DefaultActiveTpl       = "{{ . | cyan }}\n"
-	DefaultInactiveTpl     = "{{ . | white }}\n"
-	DefaultDetailsTpl      = "{{ . | white }}\n"
-	DefaultSelectedTpl     = "{{ . | cyan }}\n"
+	DefaultActiveTpl       = "{{ . | cyan }}"
+	DefaultInactiveTpl     = "{{ . | white }}"
+	DefaultDetailsTpl      = "{{ . | white }}"
+	DefaultSelectedTpl     = "{{ . | cyan }}"
 	DefaultSelectHeaderTpl = "{{ \"Use the arrow keys to navigate: ↓ ↑ → ←\" | faint }}"
 	DefaultSelectPromptTpl = "{{ \"Select\" | faint }} {{ . | faint}}:"
 	DefaultDisPlaySize     = 5
@@ -29,7 +31,7 @@ type Select struct {
 	Config *SelectConfig
 	Items  interface{}
 	buf    bytes.Buffer
-	high   uint
+	height int
 
 	selectPrompt *template.Template
 	selectHeader *template.Template
@@ -100,7 +102,7 @@ func (s *Select) writeData(l *list.List) {
 	s.buf.Reset()
 
 	// clean terminal
-	for i := uint(0); i < s.high; i++ {
+	for i := 0; i < s.height; i++ {
 		s.buf.WriteString(moveUp)
 		s.buf.WriteString(clearLine)
 	}
@@ -127,8 +129,8 @@ func (s *Select) writeData(l *list.List) {
 	s.buf.WriteString(hideCursor)
 
 	// set high
-	//s.high = len(strings.Split(s.buf.String(), "\n")) - 1
-	s.high = util.GetTerminalHeight()
+	s.height = len(strings.Split(s.buf.String(), "\n")) - 1
+	//s.high = util.GetTerminalHeight()
 }
 
 func (s *Select) Run() int {
@@ -190,7 +192,7 @@ func (s *Select) Run() int {
 
 	// clean terminal
 	s.buf.Reset()
-	for i := uint(0); i < s.high; i++ {
+	for i := 0; i < s.height; i++ {
 		s.buf.WriteString(moveUp)
 		s.buf.WriteString(clearLine)
 	}

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/mritd/promptx"
 )
@@ -45,16 +47,23 @@ func main() {
 		SelectPrompt: "Commit Type",
 		SelectedTpl:  "{{ \"» Type:\" | green }} {{ .Type }}",
 		DisPlaySize:  9,
-		DetailsTpl: `
---------- Commit Type ----------
-{{ "Type:" | faint }}	{{ .Type }}
-{{ "Description:" | faint }}	{{ .ZHDescription }}({{ .ENDescription }})`,
+		//DetailsTpl:   "--------- Commit Type ----------",
+		//{{ "Type:" | faint }}	{{ .Type }}
+		//{{ "Description:" | faint }}	{{ .ZHDescription }}({{ .ENDescription }})`,
 	}
 
 	s := &promptx.Select{
 		Items:  commitTypes,
 		Config: cfg,
 	}
+	s.Run()
+	p := promptx.NewDefaultPrompt(func(line []rune) error {
+		if strings.TrimSpace(string(line)) == "" {
+			return errors.New("Input is empty!")
+		} else {
+			return nil
+		}
+	}, "Please input:")
 
-	fmt.Println(commitTypes[s.Run()])
+	fmt.Println(p.Run())
 }

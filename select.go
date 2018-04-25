@@ -125,12 +125,8 @@ func (s *Select) writeData(l *list.List) {
 	// detail
 	s.buf.Write(util.Render(s.details, items[idx]))
 
-	// hide cursor
-	s.buf.WriteString(hideCursor)
-
 	// set high
 	s.height = len(strings.Split(s.buf.String(), "\n")) - 1
-	//s.high = util.GetTerminalHeight()
 }
 
 func (s *Select) Run() int {
@@ -153,6 +149,7 @@ func (s *Select) Run() int {
 	util.CheckAndExit(err)
 
 	filterInput := func(r rune) (rune, bool) {
+		isOk := false
 		switch r {
 		case readline.CharInterrupt:
 			// show cursor
@@ -161,14 +158,40 @@ func (s *Select) Run() int {
 			return r, true
 		case readline.CharEnter:
 			return r, true
+		case readline.CharReadLineExit:
+			return r, true
 		case readline.CharNext:
 			dataList.Next()
+			isOk = true
 		case readline.CharPrev:
 			dataList.Prev()
+			isOk = true
 		case readline.CharForward:
 			dataList.PageDown()
+			isOk = true
 		case readline.CharBackward:
 			dataList.PageUp()
+			isOk = true
+		case readline.CharZero:
+			dataList.Go(0)
+		case readline.CharOne:
+			dataList.Go(1)
+		case readline.CharTwo:
+			dataList.Go(2)
+		case readline.CharThree:
+			dataList.Go(3)
+		case readline.CharFour:
+			dataList.Go(4)
+		case readline.CharFive:
+			dataList.Go(5)
+		case readline.CharSix:
+			dataList.Go(6)
+		case readline.CharSeven:
+			dataList.Go(7)
+		case readline.CharEight:
+			dataList.Go(8)
+		case readline.CharNine:
+			dataList.Go(9)
 		// block other key
 		default:
 			return r, false
@@ -176,17 +199,26 @@ func (s *Select) Run() int {
 		s.writeData(dataList)
 		l.Write(s.buf.Bytes())
 		l.Refresh()
-		return r, true
+		return r, isOk
 	}
 
 	l.Config.FuncFilterInputRune = filterInput
 
-	s.writeData(dataList)
-	l.Write(s.buf.Bytes())
+	// hide cursor
+	l.Write([]byte(hideCursor))
 
+	// write data
+	s.writeData(dataList)
+
+	// write to terminal
+	_, err = l.Write(s.buf.Bytes())
+	util.CheckAndExit(err)
+
+	// read
 	_, err = l.Readline()
 	util.CheckAndExit(err)
 
+	// get select option
 	items, idx := dataList.Items()
 	result := items[idx]
 
@@ -196,14 +228,16 @@ func (s *Select) Run() int {
 		s.buf.WriteString(moveUp)
 		s.buf.WriteString(clearLine)
 	}
-	l.Write(s.buf.Bytes())
+
+	_, err = l.Write(s.buf.Bytes())
+	util.CheckAndExit(err)
 
 	// show cursor
-	l.Write([]byte(showCursor))
+	_, err = l.Write([]byte(showCursor))
+	util.CheckAndExit(err)
 	l.Refresh()
 
 	fmt.Println(string(util.Render(s.selected, result)))
 
 	return idx
-
 }

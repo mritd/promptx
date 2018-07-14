@@ -10,7 +10,7 @@ import (
 const (
 	DefaultPrompt         = "»"
 	DefaultErrorMsgPrefix = "✘ "
-	DefaultAskTpl         = "{{ . | cyan }} "
+	DefaultAskTpl         = "{{ . | green }} "
 	DefaultPromptTpl      = "{{ . | green }} "
 	DefaultInvalidTpl     = "{{ . | red }} "
 	DefaultValidTpl       = "{{ . | green }} "

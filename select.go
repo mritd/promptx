@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/mritd/promptx/list"
-	"github.com/mritd/promptx/util"
+	"github.com/mritd/promptx/utils"
 	"github.com/mritd/readline"
 )
 
@@ -82,17 +82,17 @@ func (s *Select) prepareTemplates() {
 
 	// Select prepare
 	s.selectHeader, err = template.New("").Funcs(FuncMap).Parse(s.Config.selectHeaderTpl + NewLine)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	s.selectPrompt, err = template.New("").Funcs(FuncMap).Parse(s.Config.selectPromptTpl + NewLine)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	s.selected, err = template.New("").Funcs(FuncMap).Parse(s.Config.SelectedTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	s.active, err = template.New("").Funcs(FuncMap).Parse(s.Config.ActiveTpl + NewLine)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	s.inactive, err = template.New("").Funcs(FuncMap).Parse(s.Config.InactiveTpl + NewLine)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	s.details, err = template.New("").Funcs(FuncMap).Parse(s.Config.DetailsTpl + NewLine)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 }
 
@@ -108,22 +108,22 @@ func (s *Select) writeData(l *list.List) {
 	}
 
 	// select header
-	s.buf.Write(util.Render(s.selectHeader, ""))
+	s.buf.Write(utils.Render(s.selectHeader, ""))
 
 	// select prompt
-	s.buf.Write(util.Render(s.selectPrompt, s.Config.SelectPrompt))
+	s.buf.Write(utils.Render(s.selectPrompt, s.Config.SelectPrompt))
 
 	items, idx := l.Items()
 
 	for i, item := range items {
 		if i == idx {
-			s.buf.Write(util.Render(s.active, item))
+			s.buf.Write(utils.Render(s.active, item))
 		} else {
-			s.buf.Write(util.Render(s.inactive, item))
+			s.buf.Write(utils.Render(s.inactive, item))
 		}
 	}
 	// detail
-	s.buf.Write(util.Render(s.details, items[idx]))
+	s.buf.Write(utils.Render(s.details, items[idx]))
 
 	// set high
 	s.height = len(strings.Split(s.buf.String(), "\n")) - 1
@@ -134,7 +134,7 @@ func (s *Select) Run() int {
 	s.prepareTemplates()
 
 	dataList, err := list.New(s.Items, s.Config.DisPlaySize)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:                 "",
@@ -146,7 +146,7 @@ func (s *Select) Run() int {
 		Stdin:                  readline.NewCancelableStdin(os.Stdin),
 	})
 	defer l.Close()
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	filterInput := func(r rune) (rune, bool) {
 		isOk := false
@@ -212,11 +212,11 @@ func (s *Select) Run() int {
 
 	// write to terminal
 	_, err = l.Write(s.buf.Bytes())
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	// read
 	_, err = l.Readline()
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	// get select option
 	items, idx := dataList.Items()
@@ -230,14 +230,14 @@ func (s *Select) Run() int {
 	}
 
 	_, err = l.Write(s.buf.Bytes())
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	// show cursor
 	_, err = l.Write([]byte(showCursor))
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	l.Refresh()
 
-	fmt.Println(string(util.Render(s.selected, result)))
+	fmt.Println(string(utils.Render(s.selected, result)))
 
 	return dataList.Index()
 }

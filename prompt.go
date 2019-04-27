@@ -3,7 +3,7 @@ package promptx
 import (
 	"text/template"
 
-	"github.com/mritd/promptx/util"
+	"github.com/mritd/promptx/utils"
 	"github.com/mritd/readline"
 )
 
@@ -65,15 +65,15 @@ func (p *Prompt) prepareTemplates() {
 
 	var err error
 	p.ask, err = template.New("").Funcs(FuncMap).Parse(p.AskTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	p.prompt, err = template.New("").Funcs(FuncMap).Parse(p.PromptTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	p.valid, err = template.New("").Funcs(FuncMap).Parse(p.ValidTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	p.invalid, err = template.New("").Funcs(FuncMap).Parse(p.InvalidTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 	p.errorMsg, err = template.New("").Funcs(FuncMap).Parse(p.ErrorMsgTpl)
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 }
 
@@ -81,16 +81,16 @@ func (p *Prompt) Run() string {
 	p.isFirstRun = true
 	p.prepareTemplates()
 
-	displayPrompt := append(util.Render(p.prompt, p.Prompt), util.Render(p.ask, p.Ask)...)
-	validPrompt := append(util.Render(p.valid, p.Prompt), util.Render(p.ask, p.Ask)...)
-	invalidPrompt := append(util.Render(p.invalid, p.Prompt), util.Render(p.ask, p.Ask)...)
+	displayPrompt := append(utils.Render(p.prompt, p.Prompt), utils.Render(p.ask, p.Ask)...)
+	validPrompt := append(utils.Render(p.valid, p.Prompt), utils.Render(p.ask, p.Ask)...)
+	invalidPrompt := append(utils.Render(p.invalid, p.Prompt), utils.Render(p.ask, p.Ask)...)
 
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:                 string(displayPrompt),
 		DisableAutoSaveHistory: true,
 		InterruptPrompt:        "^C",
 	})
-	util.CheckAndExit(err)
+	utils.CheckAndExit(err)
 
 	filterInput := func(r rune) (rune, bool) {
 
@@ -124,10 +124,10 @@ func (p *Prompt) Run() string {
 			l.Write([]byte(moveUp))
 		}
 		s, err := l.Readline()
-		util.CheckAndExit(err)
+		utils.CheckAndExit(err)
 		if err = p.CheckListener([]rune(s)); err != nil {
 			l.Write([]byte(clearLine))
-			l.Write([]byte(string(util.Render(p.errorMsg, DefaultErrorMsgPrefix+err.Error()))))
+			l.Write([]byte(string(utils.Render(p.errorMsg, DefaultErrorMsgPrefix+err.Error()))))
 			p.isFirstRun = false
 		} else {
 			return s

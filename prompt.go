@@ -116,12 +116,13 @@ func (p *Prompt) Run() string {
 		}
 		return nil, 0, false
 	})
-	defer l.Close()
+	defer func() { _ = l.Close() }()
 
 	// read line
 	for {
 		if !p.isFirstRun {
-			l.Write([]byte(moveUp))
+			_, err := l.Write([]byte(moveUp))
+			utils.CheckAndExit(err)
 		}
 		s, err := l.Readline()
 		utils.CheckAndExit(err)

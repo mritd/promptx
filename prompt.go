@@ -127,8 +127,8 @@ func (p *Prompt) Run() string {
 		s, err := l.Readline()
 		utils.CheckAndExit(err)
 		if err = p.CheckListener([]rune(s)); err != nil {
-			l.Write([]byte(clearLine))
-			l.Write([]byte(string(utils.Render(p.errorMsg, DefaultErrorMsgPrefix+err.Error()))))
+			_, _ = l.Write([]byte(clearLine))
+			_, _ = l.Write(utils.Render(p.errorMsg, DefaultErrorMsgPrefix+err.Error()))
 			p.isFirstRun = false
 		} else {
 			return s

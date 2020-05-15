@@ -97,7 +97,6 @@ func (s *Select) prepareTemplates() {
 }
 
 func (s *Select) writeData(l *list.List) {
-
 	// clean buffer
 	s.buf.Reset()
 
@@ -114,7 +113,6 @@ func (s *Select) writeData(l *list.List) {
 	s.buf.Write(utils.Render(s.selectPrompt, s.Config.SelectPrompt))
 
 	items, idx := l.Items()
-
 	for i, item := range items {
 		if i == idx {
 			s.buf.Write(utils.Render(s.active, item))
@@ -130,7 +128,6 @@ func (s *Select) writeData(l *list.List) {
 }
 
 func (s *Select) Run() int {
-
 	s.prepareTemplates()
 
 	dataList, err := list.New(s.Items, s.Config.DisPlaySize)
@@ -145,15 +142,15 @@ func (s *Select) Run() int {
 		DisableBell:            true,
 		Stdin:                  readline.NewCancelableStdin(os.Stdin),
 	})
-	defer l.Close()
 	utils.CheckAndExit(err)
+	defer func() { _ = l.Close() }()
 
 	filterInput := func(r rune) (rune, bool) {
-		isOk := false
+		ok := false
 		switch r {
 		case readline.CharInterrupt:
 			// show cursor
-			l.Write([]byte(showCursor))
+			_, _ = l.Write([]byte(showCursor))
 			l.Refresh()
 			return r, true
 		case readline.CharEnter:
@@ -162,16 +159,16 @@ func (s *Select) Run() int {
 			return r, true
 		case readline.CharNext:
 			dataList.Next()
-			isOk = true
+			ok = true
 		case readline.CharPrev:
 			dataList.Prev()
-			isOk = true
+			ok = true
 		case readline.CharForward:
 			dataList.PageDown()
-			isOk = true
+			ok = true
 		case readline.CharBackward:
 			dataList.PageUp()
-			isOk = true
+			ok = true
 		case readline.CharZero:
 			dataList.Go(0)
 		case readline.CharOne:
@@ -197,15 +194,15 @@ func (s *Select) Run() int {
 			return r, false
 		}
 		s.writeData(dataList)
-		l.Write(s.buf.Bytes())
+		_, _ = l.Write(s.buf.Bytes())
 		l.Refresh()
-		return r, isOk
+		return r, ok
 	}
 
 	l.Config.FuncFilterInputRune = filterInput
 
 	// hide cursor
-	l.Write([]byte(hideCursor))
+	_, _ = l.Write([]byte(hideCursor))
 
 	// write data
 	s.writeData(dataList)

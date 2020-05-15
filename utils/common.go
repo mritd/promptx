@@ -30,8 +30,7 @@ func CheckAndExit(err error) {
 
 func Render(tpl *template.Template, data interface{}) []byte {
 	var buf bytes.Buffer
-	err := tpl.Execute(&buf, data)
-	if err != nil {
+	if err := tpl.Execute(&buf, data); err != nil {
 		return []byte(fmt.Sprintf("%v", data))
 	}
 	return buf.Bytes()

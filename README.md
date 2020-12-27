@@ -1,3 +1,5 @@
+# 本仓库已废弃， promptx 已基于 [charmbracelet/bubbletea](https://github.com/charmbracelet/bubbletea) 重新实现，请使用 [mritd/bubbles](https://github.com/mritd/bubbles)。
+
 ### Promptx
 
 > 一个简单的 golang 编写的终端提示库，部分代码 copy 自 [promptui](https://github.com/manifoldco/promptui)，代码设计实现参考了 [promptui](https://github.com/manifoldco/promptui)
